@@ -1,6 +1,7 @@
 package com.example.godoit
 
 import Adapter.Adapter
+import Adapter.TaskComponents
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +14,7 @@ class TasksActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTasksBinding
     private lateinit var launcher: ActivityResultLauncher<Intent>
+    private lateinit var taskComponents: TaskComponents
     private var adapter = Adapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +28,10 @@ class TasksActivity : AppCompatActivity() {
 
     private fun registerActivityResult() {
         launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                taskComponents = it?.data?.getSerializableExtra("taskComponents") as TaskComponents
+                adapter.addTask(taskComponents)
+            }
         }
     }
 
@@ -38,6 +44,6 @@ class TasksActivity : AppCompatActivity() {
 
     private fun initRecycleView() {
         binding.tasks.adapter = adapter
-        binding.tasks.layoutManager = GridLayoutManager(this, 2)
+        binding.tasks.layoutManager = GridLayoutManager(this, 1)
     }
 }

@@ -18,8 +18,12 @@ class Adapter: RecyclerView.Adapter<Adapter.ViewHolder>() {
         fun bind(taskOption: TaskComponents) {
             if (taskOption.useTime) {
                 binding.imageView2.isVisible = true
+                binding.time.isVisible = true
+                binding.date.isVisible = true
                 binding.time.text = taskOption.time
+                binding.date.text = taskOption.date
             }
+            binding.title.isVisible = taskOption.title.isNotEmpty()
             binding.title.text = taskOption.title
             binding.description.text = taskOption.text
         }
@@ -36,5 +40,10 @@ class Adapter: RecyclerView.Adapter<Adapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
        return tasks.count()
+    }
+
+    fun addTask(taskComponents: TaskComponents) {
+        tasks.add(taskComponents)
+        notifyDataSetChanged()
     }
 }

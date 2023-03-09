@@ -16,6 +16,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <ImageButton
+                android:id="@+id/cancelButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#12AEAEAE"
+                android:clickable="true"
+                app:srcCompat="@android:drawable/ic_input_delete" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/title"
                 android:layout_width="409dp"
@@ -27,6 +35,7 @@
                 app:hintTextColor="#008E8E8E">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/titleEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#191919"
@@ -58,6 +67,7 @@
                 app:hintTextColor="#008E8E8E">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/taskEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#191919"
@@ -84,9 +94,33 @@
                 android:gravity="right"
                 android:text="18:00   23.01.2004"
                 android:textColor="#FFE600"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Заполните хоть какое-то поле"
+                android:textColor="#E1FF0000"
+                android:textSize="16sp"
+                android:visibility="invisible" />
 
         </LinearLayout>
     </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        app:backgroundTint="#FFF200"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_done" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
