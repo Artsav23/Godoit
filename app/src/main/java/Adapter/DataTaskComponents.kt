@@ -1,9 +1,10 @@
 package Adapter
 
-data class TaskComponents(
+import java.util.Calendar
+
+data class DataTaskComponents(
     var title: String,
     var text: String,
     var useTime: Boolean = false,
-    var time: String? = null,
-    var date: String? = null
+    var alarm: Calendar? = null
 ): java.io.Serializable

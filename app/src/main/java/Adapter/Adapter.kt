@@ -1,5 +1,6 @@
 package Adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,25 +8,41 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.godoit.R
 import com.example.godoit.databinding.ActivityItemNotificationBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
-class Adapter: RecyclerView.Adapter<Adapter.ViewHolder>() {
+class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.ViewHolder>() {
 
-    private var tasks = mutableListOf<TaskComponents>()
+    private var tasks = mutableListOf<DataTaskComponents>()
 
     class ViewHolder(item: View): RecyclerView.ViewHolder(item) {
         private val binding = ActivityItemNotificationBinding.bind(item)
+        private lateinit var taskOption: DataTaskComponents
 
-        fun bind(taskOption: TaskComponents) {
+        fun bind(taskOption: DataTaskComponents, listener: ListenerTime) {
+            this.taskOption = taskOption
             if (taskOption.useTime) {
                 binding.imageView2.isVisible = true
                 binding.time.isVisible = true
                 binding.date.isVisible = true
-                binding.time.text = taskOption.time
-                binding.date.text = taskOption.date
+                binding.time.text = SimpleDateFormat("HH:mm").format(taskOption.alarm?.timeInMillis).toString()
+                binding.date.text = SimpleDateFormat("dd.MM.yyyy").format(taskOption.alarm?.timeInMillis).toString()
+                listener.createAlarm(calendar = calendar(taskOption), title = taskOption.title, text = taskOption.text)
             }
             binding.title.isVisible = taskOption.title.isNotEmpty()
             binding.title.text = taskOption.title
             binding.description.text = taskOption.text
+        }
+
+        private fun calendar(taskOption: DataTaskComponents): Calendar {
+            val calendar = Calendar.getInstance()
+            val minute = requireNotNull(taskOption.alarm?.get(Calendar.MINUTE))
+            val hour = requireNotNull(taskOption.alarm?.get(Calendar.HOUR_OF_DAY))
+            val day = requireNotNull(taskOption.alarm?.get(Calendar.DAY_OF_MONTH))
+            val month = requireNotNull(taskOption.alarm?.get(Calendar.MONTH))
+            val year = requireNotNull(taskOption.alarm?.get(Calendar.YEAR))
+            calendar.set(year, month, day, hour, minute, 0)
+            return calendar
         }
     }
 
@@ -35,15 +52,19 @@ class Adapter: RecyclerView.Adapter<Adapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(tasks[position])
+        holder.bind(tasks[position], listener)
     }
 
     override fun getItemCount(): Int {
        return tasks.count()
     }
 
-    fun addTask(taskComponents: TaskComponents) {
-        tasks.add(taskComponents)
+    fun addTask(dataTaskComponents: DataTaskComponents) {
+        tasks.add(dataTaskComponents)
         notifyDataSetChanged()
+    }
+
+    interface ListenerTime {
+        fun createAlarm(title: String, text: String, calendar: Calendar)
     }
 }
