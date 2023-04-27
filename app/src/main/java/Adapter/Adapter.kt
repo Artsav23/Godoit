@@ -27,22 +27,11 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
                 binding.date.isVisible = true
                 binding.time.text = SimpleDateFormat("HH:mm").format(taskOption.alarm?.timeInMillis).toString()
                 binding.date.text = SimpleDateFormat("dd.MM.yyyy").format(taskOption.alarm?.timeInMillis).toString()
-                listener.createAlarm(calendar = calendar(taskOption), title = taskOption.title, text = taskOption.text)
+                listener.createAlarm(calendar = requireNotNull(taskOption.alarm), title = taskOption.title, text = taskOption.text)
             }
             binding.title.isVisible = taskOption.title.isNotEmpty()
             binding.title.text = taskOption.title
             binding.description.text = taskOption.text
-        }
-
-        private fun calendar(taskOption: DataTaskComponents): Calendar {
-            val calendar = Calendar.getInstance()
-            val minute = requireNotNull(taskOption.alarm?.get(Calendar.MINUTE))
-            val hour = requireNotNull(taskOption.alarm?.get(Calendar.HOUR_OF_DAY))
-            val day = requireNotNull(taskOption.alarm?.get(Calendar.DAY_OF_MONTH))
-            val month = requireNotNull(taskOption.alarm?.get(Calendar.MONTH))
-            val year = requireNotNull(taskOption.alarm?.get(Calendar.YEAR))
-            calendar.set(year, month, day, hour, minute, 0)
-            return calendar
         }
     }
 
