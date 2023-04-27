@@ -27,7 +27,8 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
                 binding.date.isVisible = true
                 binding.time.text = SimpleDateFormat("HH:mm").format(taskOption.alarm?.timeInMillis).toString()
                 binding.date.text = SimpleDateFormat("dd.MM.yyyy").format(taskOption.alarm?.timeInMillis).toString()
-                listener.createAlarm(calendar = requireNotNull(taskOption.alarm), title = taskOption.title, text = taskOption.text)
+                listener.createAlarm(calendar = requireNotNull(taskOption.alarm), title = taskOption.title, text = taskOption.text,
+                    code = requireNotNull(taskOption.codeNotification))
             }
             binding.title.isVisible = taskOption.title.isNotEmpty()
             binding.title.text = taskOption.title
@@ -54,6 +55,6 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
     }
 
     interface ListenerTime {
-        fun createAlarm(title: String, text: String, calendar: Calendar)
+        fun createAlarm(title: String, text: String, calendar: Calendar, code: Int)
     }
 }

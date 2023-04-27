@@ -88,7 +88,7 @@ class CreateTask : AppCompatActivity() {
     private fun endCreate() {
         binding.done.setOnClickListener {
             if (!binding.titleEditText.text.isNullOrEmpty() || !binding.taskEditText.text.isNullOrEmpty()) {
-                var code = ""
+                var code = 0
                 if (binding.checkTimer.isChecked) code = createCode()
                 val dataTaskComponents = DataTaskComponents( title = binding.titleEditText.text.toString(),
                 text = binding.taskEditText.text.toString(), useTime = binding.checkTimer.isChecked, alarm = alarmData, code)
@@ -100,11 +100,11 @@ class CreateTask : AppCompatActivity() {
         }
     }
 
-    private fun createCode(): String {
-        var code = ""
-        val symbols = "1234567890qwertyuiop[]adfghjk;'zxcvbnm,./?><:|}{+_)(*&^%$#@!)"
-        for (i in 1..(10..15).random()) {
-            code+= symbols.random()
+    private fun createCode(): Int {
+        var code = 0
+        val symbols = (1..9999999)
+        for (i in 1..(10..20).random()) {
+            code += symbols.random()
         }
         return code
     }

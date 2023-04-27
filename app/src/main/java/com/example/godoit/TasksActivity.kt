@@ -59,11 +59,12 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
         binding.tasks.layoutManager = GridLayoutManager(this, 1)
     }
 
-    override fun createAlarm(title: String, text: String, calendar: Calendar) {
+    override fun createAlarm(title: String, text: String, calendar: Calendar, code: Int) {
         val intent = Intent(applicationContext, Notification::class.java)
         intent.putExtra(titleExtra, title)
         intent.putExtra(messageExtra, text)
-        val  pendingIntent = PendingIntent.getBroadcast(applicationContext, notificationID, intent,
+        intent.putExtra(notificationID, code)
+        val  pendingIntent = PendingIntent.getBroadcast(applicationContext, code, intent,
         FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)

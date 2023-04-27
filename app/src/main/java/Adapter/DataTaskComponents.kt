@@ -7,5 +7,5 @@ data class DataTaskComponents(
     var text: String,
     var useTime: Boolean = false,
     var alarm: Calendar? = null,
-    val codeNotification: String? = null
+    val codeNotification: Int? = null
 ): java.io.Serializable
