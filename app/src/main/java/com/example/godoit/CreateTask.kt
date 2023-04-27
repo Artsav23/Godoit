@@ -18,9 +18,10 @@ class CreateTask : AppCompatActivity() {
         set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR))
         set(Calendar.MONTH, Calendar.MONTH)
         set(Calendar.DATE, Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
-        set(Calendar.MILLISECOND, 0)
-        set(Calendar.MINUTE, 0)
         set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +47,9 @@ class CreateTask : AppCompatActivity() {
             alarmData.set(Calendar.YEAR, requireNotNull(result.getInt("year")))
             alarmData.set(Calendar.MONTH, requireNotNull(result.getInt("month")))
             alarmData.set(Calendar.DAY_OF_MONTH, requireNotNull(result.getInt("day")))
-            alarmData.set(Calendar.YEAR, requireNotNull(result.getInt("year")))
-            alarmData.set(Calendar.MINUTE, requireNotNull(result.getInt("minute")))
             alarmData.set(Calendar.HOUR_OF_DAY, requireNotNull(result.getInt("hour")))
+            alarmData.set(Calendar.MINUTE, requireNotNull(result.getInt("minute")))
+
 
 
             val timer = "${SimpleDateFormat("HH:mm dd.MM.yyyy").format(alarmData.timeInMillis)}"

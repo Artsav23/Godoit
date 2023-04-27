@@ -20,11 +20,13 @@ class TimeDialogFragment : DialogFragment() {
         binding = FragmentTimeDialogBinding.inflate(LayoutInflater.from(context))
         alarmData = Calendar.getInstance().apply {
             set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR))
-            set(Calendar.MONTH, Calendar.MONTH)
-            set(Calendar.DATE, Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
-            set(Calendar.MILLISECOND, 0)
-            set(Calendar.MINUTE, 0)
+            set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH))
+            set(Calendar.DAY_OF_MONTH, Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
             set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+
         }
 
         val builder = AlertDialog.Builder(requireActivity())
@@ -47,11 +49,9 @@ class TimeDialogFragment : DialogFragment() {
 
     private fun changeCalendarDay() {
         binding.calendarView.setOnDateChangeListener { _, year, month, day ->
-            Log.d("my_log", alarmData.get(Calendar.DAY_OF_MONTH).toString())
             alarmData.set(Calendar.YEAR, year)
             alarmData.set(Calendar.MONTH, month)
             alarmData.set(Calendar.DAY_OF_MONTH, day)
-            Log.d("my_log", alarmData.get(Calendar.DAY_OF_MONTH).toString())
         }
     }
 
@@ -60,12 +60,13 @@ class TimeDialogFragment : DialogFragment() {
             if (checkDate() && checkTime()) {
                 parentFragmentManager.setFragmentResult(TAG,
                     Bundle().apply {
-                        putInt("day", alarmData.get(Calendar.DAY_OF_MONTH))
                         putInt("year", alarmData.get(Calendar.YEAR))
                         putInt("month", alarmData.get(Calendar.MONTH))
-                        putInt("minute", alarmData.get(Calendar.MINUTE))
+                        putInt("day", alarmData.get(Calendar.DAY_OF_MONTH))
                         putInt("hour", alarmData.get(Calendar.HOUR_OF_DAY))
+                        putInt("minute", alarmData.get(Calendar.MINUTE))
                     })
+                Log.d("my_log", alarmData.time.toString())
                 dismiss()
             }
             else {
