@@ -24,7 +24,6 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
 
     private lateinit var binding: ActivityTasksBinding
     private lateinit var launcher: ActivityResultLauncher<Intent>
-    private lateinit var dataTaskComponents: DataTaskComponents
     private var adapter = Adapter(this)
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -40,9 +39,19 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
 
     private fun registerActivityResult() {
         launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                dataTaskComponents = it.data?.getSerializableExtra("dataTaskComponents") as DataTaskComponents
-                adapter.addTask(dataTaskComponents)
+            if (it.resultCode != RESULT_CANCELED) {
+                val dataTaskComponents =
+                    it.data?.getSerializableExtra("dataTaskComponents") as DataTaskComponents
+
+                if (it.resultCode == RESULT_OK) {
+                    adapter.addTask(dataTaskComponents)
+                } else if (it.resultCode == 111) {
+                    val position = it.data?.getIntExtra("position", -1)
+                    adapter.changeTask(
+                        dataTaskComponents = dataTaskComponents,
+                        position = requireNotNull(position)
+                    )
+                }
             }
         }
     }
@@ -60,14 +69,23 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
     }
 
     override fun createAlarm(title: String, text: String, calendar: Calendar, code: Int) {
-        val intent = Intent(applicationContext, Notification::class.java)
-        intent.putExtra(titleExtra, title)
-        intent.putExtra(messageExtra, text)
-        intent.putExtra(notificationID, code)
+        val intent = Intent(applicationContext, Notification::class.java).apply {
+            putExtra(titleExtra, title)
+            putExtra(messageExtra, text)
+            putExtra(notificationID, code)
+        }
         val  pendingIntent = PendingIntent.getBroadcast(applicationContext, code, intent,
         FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+    }
+
+    override fun changeTask(taskOption: DataTaskComponents, position: Int) {
+        val intent = Intent(this, CreateTask::class.java).apply {
+            putExtra("dataTaskComponents", taskOption)
+            putExtra("position", position)
+        }
+        launcher.launch(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

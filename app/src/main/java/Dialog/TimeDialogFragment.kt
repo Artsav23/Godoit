@@ -81,7 +81,7 @@ class TimeDialogFragment : DialogFragment() {
         val day = alarmData.get(Calendar.DAY_OF_MONTH)
         val month = alarmData.get(Calendar.MONTH)
         val  year = alarmData.get(Calendar.YEAR)
-        return ((Calendar.getInstance().get(Calendar.YEAR)!= year || month != Calendar.MONTH
+        return ((Calendar.getInstance().get(Calendar.YEAR)!= year || month != Calendar.getInstance().get(Calendar.MONTH)
                 || day != Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) || (hour>=Calendar.getInstance().get(Calendar.HOUR_OF_DAY) ||
                 Calendar.getInstance().get(Calendar.MINUTE) < minute))
     }
@@ -94,7 +94,6 @@ class TimeDialogFragment : DialogFragment() {
                 (Calendar.getInstance().get(Calendar.YEAR) < year)
                 || (Calendar.getInstance().get(Calendar.YEAR) == year  && Calendar.MONTH == month &&
                 Calendar.getInstance().get(Calendar.DAY_OF_MONTH) <= day)
-
     }
 
     companion object {
