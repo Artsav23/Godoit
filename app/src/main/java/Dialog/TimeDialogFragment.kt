@@ -57,7 +57,7 @@ class TimeDialogFragment : DialogFragment() {
 
     private fun sendResult() {
         binding.sendDate.setOnClickListener {
-            if (checkDate() && checkTime()) {
+            if (checkDate() || checkTime()) {
                 parentFragmentManager.setFragmentResult(TAG,
                     Bundle().apply {
                         putInt("year", alarmData.get(Calendar.YEAR))
@@ -81,19 +81,20 @@ class TimeDialogFragment : DialogFragment() {
         val day = alarmData.get(Calendar.DAY_OF_MONTH)
         val month = alarmData.get(Calendar.MONTH)
         val  year = alarmData.get(Calendar.YEAR)
-        return ((Calendar.getInstance().get(Calendar.YEAR)!= year || month != Calendar.getInstance().get(Calendar.MONTH)
-                || day != Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) || (hour>=Calendar.getInstance().get(Calendar.HOUR_OF_DAY) ||
-                Calendar.getInstance().get(Calendar.MINUTE) < minute))
+        return (day == Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && month == Calendar.getInstance().get(Calendar.MONTH) &&
+                Calendar.getInstance().get(Calendar.YEAR) == year) &&
+                ((hour == Calendar.getInstance().get(Calendar.HOUR_OF_DAY) &&
+                        minute > Calendar.getInstance().get(Calendar.MINUTE)) || (hour > Calendar.getInstance().get(Calendar.HOUR_OF_DAY)))
     }
 
     private fun checkDate(): Boolean {
         val day = alarmData.get(Calendar.DAY_OF_MONTH)
         val month = alarmData.get(Calendar.MONTH)
         val  year = alarmData.get(Calendar.YEAR)
-        return (Calendar.getInstance().get(Calendar.YEAR) == year && Calendar.MONTH < month) ||
-                (Calendar.getInstance().get(Calendar.YEAR) < year)
-                || (Calendar.getInstance().get(Calendar.YEAR) == year  && Calendar.MONTH == month &&
-                Calendar.getInstance().get(Calendar.DAY_OF_MONTH) <= day)
+        return (Calendar.getInstance().get(Calendar.YEAR) == year && Calendar.getInstance().get(Calendar.MONTH) < month) ||
+                (Calendar.getInstance().get(Calendar.YEAR) < year) ||
+                (Calendar.getInstance().get(Calendar.YEAR) == year && Calendar.getInstance().get(Calendar.MONTH) == month &&
+                        day > Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
     }
 
     companion object {

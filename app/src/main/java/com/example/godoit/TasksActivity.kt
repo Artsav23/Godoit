@@ -13,6 +13,8 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -86,6 +88,33 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
             putExtra("position", position)
         }
         launcher.launch(intent)
+    }
+
+    override fun changeVisibilityCheckBox(position: Int?, isVisibility: Boolean) {
+        adapter.changeVisibilityCheckBox(position, isVisibility)
+        setSupportActionBar(binding.toolbar)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_activity_tasks, menu)
+        binding.toolbar.title = ""
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.cancel -> adapter.changeVisibilityCheckBox(position = null, visibility = false)
+            R.id.clear -> {
+                adapter.delete()
+                adapter.changeVisibilityCheckBox(position = null, visibility = false)
+            }
+        }
+        binding.toolbar.menu.clear()
+        return true
+    }
+
+    override fun changeCheck(isChecked: Boolean, position: Int) {
+        adapter.changeCheck(isChecked, position)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -1,9 +1,9 @@
 package Adapter
 
 import android.annotation.SuppressLint
-import android.provider.AlarmClock
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -24,11 +24,30 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
         fun bind(taskOption: DataTaskComponents, listener: ListenerTime, position: Int) {
             this.taskOption = taskOption
             createTask()
-            alarmClock(listener, alarm = taskOption.alarm)
-            itemView.setOnClickListener { listener.changeTask(taskOption, position) }
+            alarmClock(listener)
+            itemView.setOnLongClickListener {
+                listener.changeVisibilityCheckBox(position, isVisibility = true)
+                false
+            }
+            viewTouchListener(listener, position)
+            binding.checkBox.isVisible = taskOption.checkVisibility
+            binding.checkBox.isChecked = taskOption.check
+            binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
+                listener.changeCheck(isChecked, position)
+            }
         }
 
-        private fun alarmClock(listener: ListenerTime, alarm: Calendar?) {
+        @SuppressLint("ClickableViewAccessibility")
+        private fun viewTouchListener(listener: ListenerTime, position: Int) {
+            itemView.setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_UP && (event.eventTime - event.downTime) < 300) {
+                    listener.changeTask(taskOption, position)
+                }
+                false
+            }
+        }
+
+        private fun alarmClock(listener: ListenerTime) {
             if (taskOption.useTime)
                  addAlarmClock(listener)
         }
@@ -55,22 +74,6 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
                             day > Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
         }
 
-        private fun notOldDate(alarm: Calendar): Boolean {
-            val day = alarm.get(Calendar.DAY_OF_MONTH)
-            val month = alarm.get(Calendar.MONTH)
-            val  year = alarm.get(Calendar.YEAR)
-            val minute = alarm.get(Calendar.MINUTE)
-            val hour = alarm.get(Calendar.HOUR_OF_DAY)
-            return ((Calendar.getInstance().get(Calendar.YEAR) == year && Calendar.MONTH < month) ||
-                    (Calendar.getInstance().get(Calendar.YEAR) < year)
-                    || (Calendar.getInstance().get(Calendar.YEAR) == year  && Calendar.MONTH == month &&
-                    Calendar.getInstance().get(Calendar.DAY_OF_MONTH) <= day))
-                    && ((Calendar.getInstance().get(Calendar.YEAR)!= year || month != Calendar.getInstance().get(Calendar.MONTH)
-                    || day != Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) ||
-                    (hour>=Calendar.getInstance().get(Calendar.HOUR_OF_DAY) ||
-                            Calendar.getInstance().get(Calendar.MINUTE) < minute))
-        }
-
         private fun createTask() {
             binding.title.isVisible = taskOption.title.isNotEmpty()
             binding.title.text = taskOption.title
@@ -84,7 +87,6 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
             binding.date.isVisible = true
             binding.time.text = SimpleDateFormat("HH:mm").format(taskOption.alarm?.timeInMillis).toString()
             binding.date.text = SimpleDateFormat("dd.MM.yyyy").format(taskOption.alarm?.timeInMillis).toString()
-            Log.d("my_log", (checkTime(requireNotNull(taskOption.alarm)) || checkDate(requireNotNull(taskOption.alarm))).toString())
             if (checkTime(requireNotNull(taskOption.alarm)) || checkDate(requireNotNull(taskOption.alarm)))
                 listener.createAlarm(calendar = requireNotNull(taskOption.alarm), title = taskOption.title, text = taskOption.text,
                 code = requireNotNull(taskOption.codeNotification))
@@ -114,8 +116,30 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
         notifyDataSetChanged()
     }
 
+    fun changeVisibilityCheckBox(position: Int?, visibility: Boolean) {
+        tasks.forEach {
+            it.checkVisibility = visibility
+            it.check = false
+        }
+        if (position != null) tasks[position].check = true
+        notifyDataSetChanged()
+    }
+
+    fun changeCheck(isChecked: Boolean, position: Int) {
+        tasks[position].check = isChecked
+    }
+
+    fun delete() {
+        val iterator = tasks.iterator()
+        while (iterator.hasNext()) {
+            if (iterator.next().check) iterator.remove()
+        }
+    }
+
     interface ListenerTime {
         fun createAlarm(title: String, text: String, calendar: Calendar, code: Int)
         fun changeTask (taskOption: DataTaskComponents, position: Int)
+        fun changeVisibilityCheckBox (position: Int?, isVisibility: Boolean)
+        fun changeCheck(isChecked: Boolean, position: Int)
     }
 }
