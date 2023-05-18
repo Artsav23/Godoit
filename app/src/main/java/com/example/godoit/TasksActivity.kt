@@ -10,16 +10,24 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.godoit.databinding.ActivityTasksBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.io.File
+import java.lang.Exception
+import java.lang.reflect.Type
 import java.util.*
 
 class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
@@ -27,6 +35,7 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
     private lateinit var binding: ActivityTasksBinding
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private var adapter = Adapter(this)
+    private lateinit var sharedPreferences: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +46,37 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
         addTask()
         registerActivityResult()
         createNotificationChanel()
+        sharedPreferences  = getSharedPreferences("Tasks", MODE_PRIVATE)
+        putTasks()
+    }
+
+    private fun putTasks() {
+        try {
+            val mutableList = mutableListOf<DataTaskComponents>()
+            val gson = Gson()
+            val count = sharedPreferences.getInt("count", -1)
+            Toast.makeText(this, count.toString(), Toast.LENGTH_SHORT).show()
+            if (count != -1)
+                for (i in 0 until count) {
+                    val oneElement = gson.fromJson(sharedPreferences.getString(i.toString(), ""), DataTaskComponents::class.java)
+                    mutableList.add(oneElement)
+                }
+            adapter.putTasks(mutableList)
+        }
+        catch (e: Exception) {
+            Toast.makeText(this, "12", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onPause() {
+        val saveMutableList = adapter.getTasks()
+        val gson = Gson()
+        for (i in 0 until saveMutableList.size) {
+            val dataTaskComponents = gson.toJson(saveMutableList[i])
+            sharedPreferences.edit().putString(i.toString(), dataTaskComponents).apply()
+        }
+        sharedPreferences.edit().putInt("count", saveMutableList.size).apply()
+        super.onPause()
     }
 
     private fun registerActivityResult() {

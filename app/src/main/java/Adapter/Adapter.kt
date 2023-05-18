@@ -1,7 +1,6 @@
 package Adapter
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -134,6 +133,15 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
         while (iterator.hasNext()) {
             if (iterator.next().check) iterator.remove()
         }
+    }
+
+    fun getTasks(): MutableList<DataTaskComponents> {
+        return tasks
+    }
+
+    fun putTasks(mutableList: MutableList<DataTaskComponents>) {
+        tasks = mutableList
+        notifyDataSetChanged()
     }
 
     interface ListenerTime {
