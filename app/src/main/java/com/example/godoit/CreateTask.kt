@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.view.isVisible
 import com.example.godoit.databinding.ActivityCreateTaskBinding
 import java.text.SimpleDateFormat
@@ -25,6 +26,7 @@ class CreateTask : AppCompatActivity() {
     }
     private var position: Int = -1
     private lateinit var dataTaskComponents: DataTaskComponents
+    private var deleteAlarm: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +41,12 @@ class CreateTask : AppCompatActivity() {
     }
 
     private fun checkChange() {
-        if (intent.getIntExtra("position", -1) != -1) {
+        position = intent.getIntExtra("position", -1)
+        if (position != -1) {
             position = intent.getIntExtra("position", -1)
             dataTaskComponents = intent.getSerializableExtra("dataTaskComponents") as DataTaskComponents
             alarmData = dataTaskComponents.alarm as Calendar
+            deleteAlarm = dataTaskComponents.useTime
 
             binding.titleEditText.setText(dataTaskComponents.title)
             binding.taskEditText.setText(dataTaskComponents.text)
@@ -113,8 +117,15 @@ class CreateTask : AppCompatActivity() {
                 val resultCode: Int
                 if (position != -1) {
                     code = dataTaskComponents.codeNotification
+
+                    if (dataTaskComponents.codeNotification == null
+                        && binding.checkTimer.isChecked) code = createCode()
+
                     intent.putExtra("position", position)
                     resultCode = 111
+                    if (deleteAlarm == true && !binding.checkTimer.isChecked) {
+                        intent.putExtra("DeleteAlarm", deleteAlarm)
+                    }
                 }
                 else {
                     if (binding.checkTimer.isChecked) code = createCode()

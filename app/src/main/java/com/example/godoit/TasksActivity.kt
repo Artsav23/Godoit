@@ -48,6 +48,7 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
         createNotificationChanel()
         sharedPreferences  = getSharedPreferences("Tasks", MODE_PRIVATE)
         putTasks()
+        adapter.changeVisibilityCheckBox(position = null, visibility = false)
     }
 
     private fun putTasks() {
@@ -63,8 +64,7 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
                 }
             adapter.putTasks(mutableList)
         }
-        catch (e: Exception) {
-            Toast.makeText(this, "12", Toast.LENGTH_SHORT).show()
+        catch (_: Exception) {
         }
     }
 
@@ -76,6 +76,8 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
             sharedPreferences.edit().putString(i.toString(), dataTaskComponents).apply()
         }
         sharedPreferences.edit().putInt("count", saveMutableList.size).apply()
+        binding.toolbar.menu.clear()
+        adapter.changeVisibilityCheckBox(position = null, visibility = false)
         super.onPause()
     }
 
@@ -88,10 +90,12 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
                 if (it.resultCode == RESULT_OK) {
                     adapter.addTask(dataTaskComponents)
                 } else if (it.resultCode == 111) {
+                    val deleteAlarm = it.data?.getBooleanExtra("DeleteAlarm", false)
                     val position = it.data?.getIntExtra("position", -1)
                     adapter.changeTask(
                         dataTaskComponents = dataTaskComponents,
-                        position = requireNotNull(position)
+                        position = requireNotNull(position),
+                        requireNotNull(deleteAlarm)
                     )
                 }
             }
@@ -155,6 +159,14 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
 
     override fun changeCheck(isChecked: Boolean, position: Int) {
         adapter.changeCheck(isChecked, position)
+    }
+
+    override fun deleteAlarmClock(code: Int) {
+        val intent = Intent(this, Notification::class.java)
+        val  pendingIntent = PendingIntent.getBroadcast(applicationContext, code, intent,
+            FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

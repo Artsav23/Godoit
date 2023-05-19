@@ -1,6 +1,7 @@
 package Adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -11,7 +12,6 @@ import com.example.godoit.R
 import com.example.godoit.databinding.ActivityItemNotificationBinding
 import java.text.SimpleDateFormat
 import java.util.*
-
 class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.ViewHolder>() {
 
     private var tasks = mutableListOf<DataTaskComponents>()
@@ -25,15 +25,20 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
             createTask()
             alarmClock(listener)
             itemView.setOnLongClickListener {
+
                 listener.changeVisibilityCheckBox(position, isVisibility = true)
                 false
             }
             viewTouchListener(listener, position)
             binding.checkBox.isVisible = taskOption.checkVisibility
-            binding.checkBox.isChecked = taskOption.check
-            binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
-                listener.changeCheck(isChecked, position)
+            binding.checkBox.isChecked = taskOption.check.also {
+                binding.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                    if (buttonView.isClickable)
+                        listener.changeCheck(isChecked, position)
+                }
             }
+
+
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -49,6 +54,11 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
         private fun alarmClock(listener: ListenerTime) {
             if (taskOption.useTime)
                  addAlarmClock(listener)
+            else {
+                binding.imageView2.isVisible = false
+                binding.time.isVisible = false
+                binding.date.isVisible = false
+            }
         }
 
         private fun checkTime(alarmData: Calendar): Boolean {
@@ -110,8 +120,11 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
         notifyDataSetChanged()
     }
 
-    fun changeTask(dataTaskComponents: DataTaskComponents, position: Int) {
+    fun changeTask(dataTaskComponents: DataTaskComponents, position: Int, deleteAlarmClock: Boolean) {
         tasks[position] = dataTaskComponents
+        if (deleteAlarmClock) {
+            listener.deleteAlarmClock(requireNotNull(tasks[position].codeNotification))
+        }
         notifyDataSetChanged()
     }
 
@@ -129,10 +142,11 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
     }
 
     fun delete() {
-        val iterator = tasks.iterator()
-        while (iterator.hasNext()) {
-            if (iterator.next().check) iterator.remove()
+        for (i in 0 until tasks.size) {
+            if (tasks[i].useTime) listener.deleteAlarmClock(requireNotNull(tasks[i].codeNotification))
         }
+        tasks.removeAll { it.check }
+        notifyDataSetChanged()
     }
 
     fun getTasks(): MutableList<DataTaskComponents> {
@@ -149,5 +163,7 @@ class Adapter(private val listener: ListenerTime): RecyclerView.Adapter<Adapter.
         fun changeTask (taskOption: DataTaskComponents, position: Int)
         fun changeVisibilityCheckBox (position: Int?, isVisibility: Boolean)
         fun changeCheck(isChecked: Boolean, position: Int)
+        fun deleteAlarmClock(code: Int)
     }
 }
+
