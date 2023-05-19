@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 

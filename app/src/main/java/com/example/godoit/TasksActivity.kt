@@ -14,20 +14,15 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.godoit.databinding.ActivityTasksBinding
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.io.File
 import java.lang.Exception
-import java.lang.reflect.Type
 import java.util.*
 
 class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
@@ -46,7 +41,7 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
         addTask()
         registerActivityResult()
         createNotificationChanel()
-        sharedPreferences  = getSharedPreferences("Tasks", MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences("Tasks", MODE_PRIVATE)
         putTasks()
         adapter.changeVisibilityCheckBox(position = null, visibility = false)
     }
@@ -56,7 +51,6 @@ class TasksActivity : AppCompatActivity(), Adapter.ListenerTime {
             val mutableList = mutableListOf<DataTaskComponents>()
             val gson = Gson()
             val count = sharedPreferences.getInt("count", -1)
-            Toast.makeText(this, count.toString(), Toast.LENGTH_SHORT).show()
             if (count != -1)
                 for (i in 0 until count) {
                     val oneElement = gson.fromJson(sharedPreferences.getString(i.toString(), ""), DataTaskComponents::class.java)

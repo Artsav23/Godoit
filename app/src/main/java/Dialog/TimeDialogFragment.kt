@@ -3,9 +3,12 @@ package Dialog
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.godoit.databinding.FragmentTimeDialogBinding
@@ -18,6 +21,7 @@ class TimeDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = FragmentTimeDialogBinding.inflate(LayoutInflater.from(context))
+
         alarmData = Calendar.getInstance().apply {
             set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR))
             set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH))
@@ -26,7 +30,6 @@ class TimeDialogFragment : DialogFragment() {
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-
         }
 
         val builder = AlertDialog.Builder(requireActivity())
@@ -35,6 +38,11 @@ class TimeDialogFragment : DialogFragment() {
         changeCalendarDay()
         changeTime()
         return builder.create()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     private fun changeTime() {
@@ -66,7 +74,6 @@ class TimeDialogFragment : DialogFragment() {
                         putInt("hour", alarmData.get(Calendar.HOUR_OF_DAY))
                         putInt("minute", alarmData.get(Calendar.MINUTE))
                     })
-                Log.d("my_log", alarmData.time.toString())
                 dismiss()
             }
             else {
